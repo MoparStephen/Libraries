@@ -1,0 +1,173 @@
+
+.if .not .def __VBXE_AUTO__ .and .not .def __VBXE_D700__	; default case - vbxe at 0xd640
+VBXE_BASE		equ	0xd600
+.elseif .not .def __VBXE_AUTO__ .and def __VBXE_D700__		; vbxe is assumed to be under 0xd740
+VBXE_BASE		equ	0xd700
+.else								; vbxe should be autodetected
+VBXE_BASE		equ	0x0000
+.endif
+
+VBXE_VIDEO_CONTROL	equ	VBXE_BASE+0x40
+VBXE_XDL_ADR0		equ	VBXE_BASE+0x41
+VBXE_MINOR		equ	VBXE_BASE+0x41
+VBXE_XDL_ADR1		equ	VBXE_BASE+0x42
+VBXE_XDL_ADR2		equ	VBXE_BASE+0x43
+VBXE_CSEL		equ	VBXE_BASE+0x44
+VBXE_PSEL		equ	VBXE_BASE+0x45
+VBXE_CR			equ	VBXE_BASE+0x46
+VBXE_CG			equ	VBXE_BASE+0x47
+VBXE_CB			equ	VBXE_BASE+0x48
+VBXE_COLMASK		equ	VBXE_BASE+0x49
+VBXE_COLCLR		equ	VBXE_BASE+0x4a
+VBXE_MB_CTL		equ	VBXE_BASE+0x5d
+VBXE_MA_CTL		equ	VBXE_BASE+0x5e
+VBXE_MA_BSEL		equ	VBXE_BASE+0x5f
+VBXE_BL_ADR0		equ	VBXE_BASE+0x50
+VBXE_BL_ADR1		equ	VBXE_BASE+0x51
+VBXE_BL_ADR2		equ	VBXE_BASE+0x52
+VBXE_BLITTER_START	equ	VBXE_BASE+0x53
+VBXE_BLITTER_BUSY	equ	VBXE_BASE+0x53
+VBXE_IRQ_CONTROL	equ	VBXE_BASE+0x54
+
+;--------------------------------------------------------
+;		Structures for VBXE
+;
+;--------------------------------------------------------
+BLTBLK	.struct
+	orgin_ptr	.long
+	ostep_y		.word
+	ostep_x		.byte
+	dest_ptr	.long
+	dstep_y		.word
+	dstep_x		.byte
+	width		.word
+	height		.byte
+	and_mask	.byte
+	xor_mask	.byte
+	col_mask	.byte
+	zoom		.byte
+	pattern		.byte
+	control		.byte
+.ends
+
+;--------------------------------------------------------
+;		Zero page variables for VBXE
+;
+;--------------------------------------------------------
+.zpvar	VBXEBase	.word
+.zpvar	Y_Register	.byte
+
+;--------------------------------------------------------
+;		Other variables for VBXE
+;
+;--------------------------------------------------------
+.var	Pal_ptr		.word
+
+;--------------------------------------------------------
+;		Macro definitions for VBXE
+;
+;--------------------------------------------------------
+
+;--------------------------------------------------------
+;vblda	- loads accumulator with VBXE register value
+;	  use:	vblda	VBXE_REGISTER
+
+vblda	.macro
+.ifdef	__VBXE_AUTO__
+	lda	VBXEBase+1
+	sta	vblda_adr
+	lda.w	:1
+vblda_adr	equ *-1
+.else
+	lda	:1
+.endif
+.endm
+
+;--------------------------------------------------------
+;vbsta	- stores accumulator in VBXE register
+;	  use:	vbsta	VBXE_REGISTER
+
+vbsta	.macro
+.ifdef	__VBXE_AUTO__
+	pha
+	lda	VBXEBase+1
+	sta	vbsta_adr
+	pla
+	sta.w	:1
+vbsta_adr	equ *-1
+.else
+	sta.w	:1
+.endif
+.endm
+
+;--------------------------------------------------------
+;		Common calls for VBXE
+;
+;--------------------------------------------------------
+
+;--------------------------------------------------------
+;VBXE_Detect - detects VBXE FX core version 1.07 and above,
+; and stores VBXE Base address in VBXEBase
+VBXE_Detect
+	lda	#0
+	ldx	#0xd6
+	sta	0xd640			; make sure it isn't coincidence
+	lda	0xd640
+	cmp	#0x10			; do we have major version here?
+	beq	VBXE_Detected		; if so, then VBXE is detected
+	lda	#0
+	inx
+	sta	0xd740			; no such luck, try other location
+	lda	0xd740
+	cmp	#0x10
+	beq	VBXE_Detected
+	ldx 	#0  			; not here, so not present or FX core version too low
+	stx	VBXEBase+1
+	stx	VBXEBase
+	sec
+	rts
+VBXE_Detected:
+	stx	VBXEBase+1
+	lda	#0
+	sta	VBXEBase
+	vblda	VBXE_MINOR		; get core minor version
+	clc	 			; x - page of vbxe
+	rts
+
+;--------------------------------------------------------
+; VBXE_SetPalette - sets palette
+;	A	- color to start with
+;	X	- palette number
+;	Pal_ptr	- palette pointer
+VBXE_SetPalette
+	vbsta	VBXE_CSEL		; start from color index A
+	txa
+	vbsta	VBXE_PSEL		; select the palette to alter
+	lda	Pal_ptr
+	sta	VBXE_SetPalette_pal1	; setup self-modyfying code
+	sta	VBXE_SetPalette_pal2
+	sta	VBXE_SetPalette_pal3
+	ldx	Pal_ptr+1
+	stx	VBXE_SetPalette_pal1+1
+	inx
+	stx	VBXE_SetPalette_pal2+1
+	inx
+	stx	VBXE_SetPalette_pal3+1
+	ldx	#0
+VBXE_SetPalette_l1
+	lda	0x55AA,x
+VBXE_SetPalette_pal1	equ *-2
+	sta	VBXE_CR			; set the red component,
+	lda	0x56AA,x
+VBXE_SetPalette_pal2	equ *-2
+	sta	VBXE_CG			; green component,
+	lda	0x57AA,x
+VBXE_SetPalette_pal3	equ *-2
+	sta	VBXE_CB			; blue component, and auto-increment color index
+	inx
+	bne	VBXE_SetPalette_l1
+	rts
+
+
+;--------------------------------------------------------
+;--------------------------------------------------------
