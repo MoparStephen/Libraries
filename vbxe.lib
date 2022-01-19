@@ -9,18 +9,18 @@ VBXE_BASE		equ	0x0000
 
 VBXE_VIDEO_CONTROL	equ	VBXE_BASE+0x40
 VBXE_XDL_ADR0		equ	VBXE_BASE+0x41
-VBXE_MINOR		equ	VBXE_BASE+0x41
+VBXE_MINOR			equ	VBXE_BASE+0x41
 VBXE_XDL_ADR1		equ	VBXE_BASE+0x42
 VBXE_XDL_ADR2		equ	VBXE_BASE+0x43
-VBXE_CSEL		equ	VBXE_BASE+0x44
-VBXE_PSEL		equ	VBXE_BASE+0x45
-VBXE_CR			equ	VBXE_BASE+0x46
-VBXE_CG			equ	VBXE_BASE+0x47
-VBXE_CB			equ	VBXE_BASE+0x48
+VBXE_CSEL			equ	VBXE_BASE+0x44
+VBXE_PSEL			equ	VBXE_BASE+0x45
+VBXE_CR				equ	VBXE_BASE+0x46
+VBXE_CG				equ	VBXE_BASE+0x47
+VBXE_CB				equ	VBXE_BASE+0x48
 VBXE_COLMASK		equ	VBXE_BASE+0x49
-VBXE_COLCLR		equ	VBXE_BASE+0x4a
-VBXE_MB_CTL		equ	VBXE_BASE+0x5d
-VBXE_MA_CTL		equ	VBXE_BASE+0x5e
+VBXE_COLCLR			equ	VBXE_BASE+0x4a
+VBXE_MB_CTL			equ	VBXE_BASE+0x5d
+VBXE_MA_CTL			equ	VBXE_BASE+0x5e
 VBXE_MA_BSEL		equ	VBXE_BASE+0x5f
 VBXE_BL_ADR0		equ	VBXE_BASE+0x50
 VBXE_BL_ADR1		equ	VBXE_BASE+0x51
@@ -31,7 +31,6 @@ VBXE_IRQ_CONTROL	equ	VBXE_BASE+0x54
 
 ;--------------------------------------------------------
 ;		Structures for VBXE
-;
 ;--------------------------------------------------------
 BLTBLK	.struct
 	orgin_ptr	.long
@@ -52,20 +51,17 @@ BLTBLK	.struct
 
 ;--------------------------------------------------------
 ;		Zero page variables for VBXE
-;
 ;--------------------------------------------------------
 .zpvar	VBXEBase	.word
 .zpvar	Y_Register	.byte
 
 ;--------------------------------------------------------
 ;		Other variables for VBXE
-;
 ;--------------------------------------------------------
 .var	Pal_ptr		.word
 
 ;--------------------------------------------------------
 ;		Macro definitions for VBXE
-;
 ;--------------------------------------------------------
 
 ;--------------------------------------------------------
@@ -102,7 +98,6 @@ vbsta_adr	equ *-1
 
 ;--------------------------------------------------------
 ;		Common calls for VBXE
-;
 ;--------------------------------------------------------
 
 ;--------------------------------------------------------
@@ -114,14 +109,14 @@ VBXE_Detect
 	sta	0xd640			; make sure it isn't coincidence
 	lda	0xd640
 	cmp	#0x10			; do we have major version here?
-	beq	VBXE_Detected		; if so, then VBXE is detected
+	beq	VBXE_Detected	; if so, then VBXE is detected
 	lda	#0
 	inx
 	sta	0xd740			; no such luck, try other location
 	lda	0xd740
 	cmp	#0x10
 	beq	VBXE_Detected
-	ldx 	#0  			; not here, so not present or FX core version too low
+	ldx 	#0  		; not here, so not present or FX core version too low
 	stx	VBXEBase+1
 	stx	VBXEBase
 	sec
@@ -130,8 +125,8 @@ VBXE_Detected:
 	stx	VBXEBase+1
 	lda	#0
 	sta	VBXEBase
-	vblda	VBXE_MINOR		; get core minor version
-	clc	 			; x - page of vbxe
+	vblda	VBXE_MINOR	; get core minor version
+	clc	 				; x - page of vbxe
 	rts
 
 ;--------------------------------------------------------
@@ -168,6 +163,3 @@ VBXE_SetPalette_pal3	equ *-2
 	bne	VBXE_SetPalette_l1
 	rts
 
-
-;--------------------------------------------------------
-;--------------------------------------------------------

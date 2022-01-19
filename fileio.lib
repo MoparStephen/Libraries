@@ -1,6 +1,5 @@
 ;--------------------------------------------------------
-;		Constants for FileIO
-;
+;		Constants for FileIO;
 ;--------------------------------------------------------
 
 DSKINT	equ	$e453 ;disk drive SIO handler
@@ -10,7 +9,7 @@ SIOINT	equ	$e459 ;main SIO handler
 SIOV	equ	$e459 ;alias for SIOINT
 SELFTST equ	$e471 ;SELF-TEST
 
-;bloki IOCB
+;IOCB Block
 IOCB	equ	$340 ;IO channels (8*16 bytes)
 ICHID	equ	$340 ;device id - index in HATABS. $ff == not opened
 ICDNO	equ	$341 ;# of device set by OS, eg. 2 for D2:
@@ -18,10 +17,10 @@ ICCMD	equ	$342 ;command for device
 ICSTA	equ	$343 ;last operation status code
 ICBUFA	equ	$344 ;address of device name to open
 ICPTL	equ	$346 ;address of procedure call that sends one byte to device decreased by 1
-ICBUFL	equ	$348 ;lenght of the buffer containing transmitted data
+ICBUFL	equ	$348 ;length of the buffer containing transmitted data
 ICAUX1	equ	$34a ;auxilary byte #1, usually containing second parameter for OPEN command
 ICAUX2	equ	$34b ;auxilary byte #2, third parameter for OPEN command
-ICAUX3	equ	$34c ;ramaining auxilary bytes
+ICAUX3	equ	$34c ;remaining auxilary bytes
 ICAUX4	equ	$34d
 ICAUX5	equ	$34e
 ICAUX6	equ	$34f
@@ -30,11 +29,11 @@ ICAUX6	equ	$34f
 HATABS	equ	0x031A
 
 ;basic CIO commands (ICCOM)
-CIO_open	equ 3	;OPEN command for IOCB channell
-CIO_gettext	equ 5	;READ of text line
-CIO_getdata	equ 7	;READ of binary data
-CIO_puttext	equ 9	;WRITE of text line
-CIO_putdata	equ 11	;WRITE of binary data
+CIO_open		equ 3	;OPEN command for IOCB channell
+CIO_gettext		equ 5	;READ of text line
+CIO_getdata		equ 7	;READ of binary data
+CIO_puttext		equ 9	;WRITE of text line
+CIO_putdata		equ 11	;WRITE of binary data
 CIO_close    	equ 12	;CLOSE of IOCB channel
 CIO_getstatus	equ 13	;READ of device status
 
@@ -42,23 +41,22 @@ CIO_getstatus	equ 13	;READ of device status
 XIO_changedir	equ 41	;Change working directory (MyDOS)
 
 ;mode of operation (ICAX1) for OPEN
-CIO_read      equ 4  ;open to read
-CIO_write     equ 8  ;open to write
-CIO_dir       equ 6  ;get directory
+CIO_read     	equ 4  ;open to read
+CIO_write     	equ 8  ;open to write
+CIO_dir       	equ 6  ;get directory
 
 ;--------------------------------------------------------
-;		Zero page variables for FileIO
-;
+;		Zero page variables for FileIO;
 ;--------------------------------------------------------
 .zpvar	BankIndex	.word
 .zpvar	AR_Temp		.byte
 .zpvar	XR_Temp		.byte
 .zpvar	YR_Temp		.byte
 ;--------------------------------------------------------
-;		Other variables for FileIO
-;
+;		Other variables for FileIO;
 ;--------------------------------------------------------
 .var	FileNamePtr	.word
+.var	FileNameLng .byte
 .var	TextPtr		.word
 Console_IOCB		.byte 0xFF
 Temporary_Handler	.byte ' :',0x9B,0x00
@@ -66,7 +64,6 @@ VBXE_Handler		.byte 'S2:',0x9B,0x00
 
 ;--------------------------------------------------------
 ;		Common calls for FileIO
-;
 ;--------------------------------------------------------
 
 ;--------------------------------------------------------
@@ -100,13 +97,13 @@ Find_Matching_IOCB_l1
 	cmp	AR_Temp		; compare device ID with the one searched
 	beq	Find_Matching_IOCB_Found
 	txa
-	add	#0x10		; add IOCB structure lenght to x pointer, and try next channel
+	add	#0x10		; add IOCB structure length to x pointer, and try next channel
 	tax
 	bpl	Find_Matching_IOCB_l1
-	ldy	#-126		; if fails, change error code to "NONEXISTENT DEVICE"
-	
+	ldy	#-126		; if fails, change error code to "NONEXISTENT DEVICE"	
 Find_Matching_IOCB_Found
 	rts
+
 ;--------------------------------------------------------
 ;Find_First_IOCB - search for first free IOCB
 ; returns:
@@ -124,11 +121,10 @@ Find_First_IOCB_l1
         cmp	#0xff		; if equals to 0xff - channel is not opened
         beq	Find_First_IOCB_found
         txa
-        add	#0x10		; add IOCB structure lenght to x pointer, and try next channel
+        add	#0x10		; add IOCB structure length to x pointer, and try next channel
         tax
         bpl	Find_First_IOCB_l1
-        ldy	#-95       	;if fails, change error code to "TOO MANY CHANNELS OPEN"
-	
+        ldy	#-95       	;if fails, change error code to "TOO MANY CHANNELS OPEN"	
 Find_First_IOCB_found
 	rts
 
@@ -201,7 +197,6 @@ SetGraphicsMode_VBXE
 ;--------------------------------------------------------
 ; LoadData - Loads file into banked memory
 ; bankindex - first bank number to load to
-
 ; This is slighty modified code provided by Mono (AtariArea)
 ; visit http://atariarea.krap.pl/forum/viewtopic.php?id=6781
 ; to see the original version
@@ -217,13 +212,12 @@ LoadData
 	sta	icbufa,x
 	lda	FileNamePtr+1
 	sta	icbufa+1,x
-	lda	#filenamelength
+	lda	FileNameLng
 	sta	icbufl,x
 	lda	#0
 	sta	icbufl+1,x
 	jsr	ciov
 	bmi	LoadData_Error
-
 	ldy	BankIndex
 LoadData_l1
 	tya
@@ -235,7 +229,7 @@ LoadData_l1
 	lda	#CIO_getdata		;getbyte
 	sta	iccmd,x
 	lda	<VBXE_WINDOW
-	sta 	icbufa,x
+	sta icbufa,x
 	lda	>VBXE_WINDOW
 	sta	icbufa+1,x
 	lda	<0x1000
@@ -244,12 +238,10 @@ LoadData_l1
 	sta	icbufl+1,x
 	jsr	ciov
 	bmi	LoadData_Close
-
 	inc	BankIndex
 	ldy	BankIndex
 	cpy	#127
 	bcc	LoadData_l1
-
 LoadData_Close
 	php
 	;at the end disable vbxe memory window
@@ -262,4 +254,3 @@ LoadData_Close
 LoadData_Error
 	rts
 
-;--------------------------------------------------------
