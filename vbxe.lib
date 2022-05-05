@@ -32,7 +32,7 @@ VBXE_IRQ_CONTROL	equ	VBXE_BASE+0x54
 ;--------------------------------------------------------
 ;		Structures for VBXE
 ;--------------------------------------------------------
-BLTBLK	.struct
+.struct BLTBLK	
 	orgin_ptr	.long
 	ostep_y		.word
 	ostep_x		.byte
