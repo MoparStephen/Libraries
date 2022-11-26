@@ -58,6 +58,7 @@ CIO_dir       	equ 6  ;get directory
 .var	FileNamePtr	.word
 .var	FileNameLng .byte
 .var	TextPtr		.word
+.var	LoadStatus	.byte	; $0 = failure, $1 = Success
 Console_IOCB		.byte 0xFF
 Temporary_Handler	.byte ' :',0x9B,0x00
 VBXE_Handler		.byte 'S2:',0x9B,0x00
@@ -201,6 +202,8 @@ SetGraphicsMode_VBXE
 ; visit http://atariarea.krap.pl/forum/viewtopic.php?id=6781
 ; to see the original version
 LoadData
+	lda #1
+	sta LoadStatus	; Indicate Failure
 	jsr	Find_First_IOCB
 	cpy	#1
 	bne	LoadData_Error
@@ -251,6 +254,8 @@ LoadData_Close
 	sta	iccmd,x
 	jsr	ciov
 	plp
-LoadData_Error
 	rts
-
+LoadData_Error
+	lda #0
+	sta LoadStatus	; Indicate Failure
+	rts
