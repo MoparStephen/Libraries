@@ -131,13 +131,15 @@ VBXE_Detected:
 
 ;--------------------------------------------------------
 ; VBXE_SetPalette - sets palette
-;	A	- color to start with
-;	X	- palette number
+;	A		- color to start with
+;	X		- palette number
 ;	Pal_ptr	- palette pointer
+; NOTE: This code cannot run from ROM
+;       The palette is stored as 256R, 256G, 256B bytes for easy loading
 VBXE_SetPalette
-	vbsta	VBXE_CSEL		; start from color index A
+	vbsta	VBXE_CSEL			; start from color index A
 	txa
-	vbsta	VBXE_PSEL		; select the palette to alter
+	vbsta	VBXE_PSEL			; select the palette to alter
 	lda	Pal_ptr
 	sta	VBXE_SetPalette_pal1	; setup self-modyfying code
 	sta	VBXE_SetPalette_pal2
@@ -163,3 +165,58 @@ VBXE_SetPalette_pal3	equ *-2
 	bne	VBXE_SetPalette_l1
 	rts
 
+;--------------------------------------------------------
+; VBXE_SetPalette2 - sets palette
+;	A			- palette number
+;	Y_Register	- palette pointer - Data MUST be page aligned
+; NOTE: This code can run from ROM
+;       The palette is stored as 256 RGB triplets
+VBXE_SetPalette2
+	vbsta VBXE_PSEL				; Set Palette 1
+	lda #0
+	vbsta VBXE_CSEL				; Start at colour 0
+
+	tay
+LoadPal1_1 lda (Y_Register),y
+	sta	VBXE_CR					; set the red component
+	iny
+	beq OverFlow1				; since 256 / 3 is not even, we must skip to next section and resume at CG
+	lda (Y_Register),y
+	sta	VBXE_CG					; set the green component
+	iny
+	lda (Y_Register),y
+	sta	VBXE_CB					; set the blue component and increment CSEL
+	iny
+	bne	LoadPal1_1				; copy a page
+LoadPal1_2 lda (Y_Register),y
+	sta	VBXE_CR					; set the red component
+	iny
+	beq LoadPal1_3
+LP1_2_G
+	lda (Y_Register),y
+	sta	VBXE_CG					; set the green component
+	iny
+	beq OverFlow2				; since 256 / 3 is not even, we must skip to next section and resume at CB
+	lda (Y_Register),y
+	sta	VBXE_CB					; set the blue component and increment CSEL
+	iny
+	bne	LoadPal1_2				; copy a page
+LoadPal1_3 lda (Y_Register),y
+	sta	VBXE_CR					; set the red component
+	iny
+	lda (Y_Register),y
+	sta	VBXE_CG					; set the green component
+	iny
+LP1_3_B
+	lda (Y_Register),y
+	sta	VBXE_CB					; set the blue component and increment CSEL
+	iny
+	bne	LoadPal1_3				; copy a page
+	rts
+
+OverFlow1
+	inc Y_Register + 1
+	jmp LP1_2_G
+OverFlow2
+	inc Y_Register + 1
+	jmp LP1_3_B
