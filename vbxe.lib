@@ -172,7 +172,7 @@ VBXE_SetPalette_pal3	equ *-2
 ; NOTE: This code can run from ROM
 ;       The palette is stored as 256 RGB triplets
 VBXE_SetPalette2
-	vbsta VBXE_PSEL				; Set Palette 1
+	vbsta VBXE_PSEL				; Set Palette #
 	lda #0
 	vbsta VBXE_CSEL				; Start at colour 0
 
