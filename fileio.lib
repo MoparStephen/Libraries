@@ -116,16 +116,16 @@ Find_Matching_IOCB_Found
 
 Find_First_IOCB
 	ldx	#0x00		; start with channel #0
-        ldy	#0x01		; set the error code to #1 - success
+	ldy	#0x01		; set the error code to #1 - success
 Find_First_IOCB_l1
 	lda	ICHID,x		; get the device ID
-        cmp	#0xff		; if equals to 0xff - channel is not opened
-        beq	Find_First_IOCB_found
-        txa
-        add	#0x10		; add IOCB structure length to x pointer, and try next channel
-        tax
-        bpl	Find_First_IOCB_l1
-        ldy	#-95       	;if fails, change error code to "TOO MANY CHANNELS OPEN"	
+	cmp	#0xff		; if equals to 0xff - channel is not opened
+	beq	Find_First_IOCB_found
+	txa
+	add	#0x10		; add IOCB structure length to x pointer, and try next channel
+	tax
+	bpl	Find_First_IOCB_l1
+	ldy	#-95       	;if fails, change error code to "TOO MANY CHANNELS OPEN"	
 Find_First_IOCB_found
 	rts
 
