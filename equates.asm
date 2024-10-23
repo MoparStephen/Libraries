@@ -43,7 +43,10 @@ PCOLR0      equ $02C0
 PCOLR1      equ $02C1
 PCOLR2      equ $02C2
 PCOLR3      equ $02C3
+COLOR0      equ $02C4
+COLOR1      equ $02C5       ; Text      in GR.0
 COLOR2      equ $02C6       ; Playfield in GR.0
+COLOR3      equ $02C7
 COLOR4      equ $02C8       ; Border    in GR.0
 CRSINH      equ $02F0       ; Cursor Inhibit (0 = On)
 CH          equ $02FC       ; Last Key Pressed
@@ -86,11 +89,24 @@ HPOSP0      equ $D000
 HPOSP1      equ $D001
 HPOSP2      equ $D002
 HPOSP3      equ $D003
+HPOSM0      equ $D004
+HPOSM1      equ $D005
+HPOSM2      equ $D006
+HPOSM3      equ $D007
 SIZEP0      equ $D008
 SIZEP1      equ $D009
 SIZEP2      equ $D00A
 SIZEP3      equ $D00B
+SIZEM       equ $D00C
 GRAFP0      equ $D00D
+COLPM0      equ $D012
+COLPM1      equ $D013
+COLPM2      equ $D014
+COLPM3      equ $D015
+COLPF0      equ $D016
+COLPF1      equ $D017
+COLPF2      equ $D018
+COLPF3      equ $D019
 COLBAK      equ $D01A
 PRIOR       equ $D01B
 GRACTL      equ $D01D
@@ -99,6 +115,7 @@ CONSOL      equ $D01F
 ; POKEY (D200-D2FF)
 KBCODE      equ $D209
 SKSTAT      equ $D20F
+RANDOM      equ $D20A
 
 ; PIA (D300-D3FF)
 PORTA       equ $D300
