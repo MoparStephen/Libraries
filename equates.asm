@@ -1,10 +1,10 @@
 ; OS Vectors
 POKMSK      equ $10
-RTCLOK      equ $12
+RTCLOK      equ $12         ; $12, $13, $14 are used
 CRITIC      equ $42
 ATRACT      equ $4D
 LMARGIN     equ $52
-RMARGIN     equ $52
+RMARGIN     equ $53
 ROWCRS      equ $54
 COLCRS      equ $55         ; $55-$56
 DINDEX      equ $57         ; Display Mode
@@ -39,7 +39,7 @@ STRIG2      equ $0286       ; 0 = Pressed, 1 = Released
 STRIG3      equ $0287       ; 0 = Pressed, 1 = Released
 TXTROW      equ $0290
 TXTCOL      equ $0291       ; Word
-PCOLR0      equ $02C0
+PCOLR0      equ $02C0       ; Shadows for $2C0 -> $D012 - $2C8 -> $D01A
 PCOLR1      equ $02C1
 PCOLR2      equ $02C2
 PCOLR3      equ $02C3
@@ -49,6 +49,7 @@ COLOR2      equ $02C6       ; Playfield in GR.0
 COLOR3      equ $02C7
 COLOR4      equ $02C8       ; Border    in GR.0
 CRSINH      equ $02F0       ; Cursor Inhibit (0 = On)
+CHBASE      equ $02F4
 CH          equ $02FC       ; Last Key Pressed
 
 /*
@@ -99,7 +100,7 @@ SIZEP2      equ $D00A
 SIZEP3      equ $D00B
 SIZEM       equ $D00C
 GRAFP0      equ $D00D
-COLPM0      equ $D012
+COLPM0      equ $D012       ; Shadowed to $D012 -> $2C0 - $D01A -> $2C8
 COLPM1      equ $D013
 COLPM2      equ $D014
 COLPM3      equ $D015
@@ -126,6 +127,11 @@ PBCTL       equ $D303
 
 ; ANTIC (D400-D5FF)
 DMACTL      equ $D400
+CHACTL      equ $D401
+DLISTL      equ $D402
+DLISTH      equ $D403
+HSCROL      equ $D404
+VSCROL      equ $D405
 PMBASE      equ $D407
 WSYNC       equ $D40A
 VCOUNT      equ $D40B
