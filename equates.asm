@@ -48,11 +48,46 @@ COLOR1      equ $02C5       ; Text      in GR.0
 COLOR2      equ $02C6       ; Playfield in GR.0
 COLOR3      equ $02C7
 COLOR4      equ $02C8       ; Border    in GR.0
+KRPDEL      equ $02D9       ; Auto Repeat Delay
+KEYREP      equ $02DA       ; Auto Repeat Rate
+NOCLIK      equ $02DB       ; Key Click Disable Flag
+HELPFLG     equ $02DC       ; Help Key Flag
+RAMSIZ      equ $02E4       ; RAM Size (Hi Byte)
+MEMTOP      equ $02E5       ; Word Top of user RAM
+MEMLO       equ $02E7       ; Word Bottom of user RAM
+DVSTAT      equ $02EA       ; 4-byte Device Status for IOCB
 CRSINH      equ $02F0       ; Cursor Inhibit (0 = On)
+CHACT       equ $02F3       ; Shadow for CHACTL
 CHBASE      equ $02F4
+DSPFLG      equ $02FE       ; Display control chars is non-zero
 CH          equ $02FC       ; Last Key Pressed
 
+; DCB (Device Control Block) for SIO
+DDEVIC      equ $0300
+DUNIT       equ $0301
+DCOMND      equ $0302
+DSTATS      equ $0303
+DBUFLO      equ $0304
+DBUFHI      equ $0305
+DTIMLO      equ $0306
+DUNUSE      equ $0307
+DBYTLO      equ $0308
+DBYTHI      equ $0309
+DAUX1       equ $030A
+DAUX2       equ $030B
+TIMER1      equ $030C       ; Word
+
 /*
+$0340-$034F: IOCB For Channel 0
+$0350-$035F: IOCB For Channel 1
+$0360-$036F: IOCB For Channel 2
+$0370-$037F: IOCB For Channel 3
+$0380-$038F: IOCB For Channel 4
+$0390-$039F: IOCB For Channel 5
+$03A0-$03AF: IOCB For Channel 6
+$03B0-$03BF: IOCB For Channel 7
+*/
+
 ICHID       equ $0340       ; Index into device name
 ICDNO       equ $0341       ; Device #
 ICCOM       equ $0342       ; Command (also ICCMD)
@@ -69,16 +104,6 @@ ICAX3       equ $034C       ; Auxiliary Byte 3
 ICAX4       equ $034D       ; Auxiliary Byte 4
 ICAX5       equ $034E       ; Auxiliary Byte 5
 ICAX6       equ $034F       ; Auxiliary Byte 6
-
-$0340-$034F: IOCB For Channel 0
-$0350-$035F: IOCB For Channel 1
-$0360-$036F: IOCB For Channel 2
-$0370-$037F: IOCB For Channel 3
-$0380-$038F: IOCB For Channel 4
-$0390-$039F: IOCB For Channel 5
-$03A0-$03AF: IOCB For Channel 6
-$03B0-$03BF: IOCB For Channel 7
-*/
 
 LINBUFF     equ $0580       ; FP ASCII output buffer, $580-$5FF
 
@@ -163,7 +188,8 @@ LOG         equ $DECD       ; natural log of FR0
 LOG10       equ $DED1       ; base 10 log of FR0
 
 ; ROM Vectors
-;CIOV        equ $E456
+CIOV        equ $E456
+SIOV        equ $E459
 SETVBV      equ $E45C       ; Set system timers and interrupt vectors
 SYSVBV      equ $E45F       ; Stage one VBLANK calculations entry point
 XITVBV      equ $E462       ; Exit VBLANK routine entry point
