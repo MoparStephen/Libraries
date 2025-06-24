@@ -31,8 +31,12 @@ FPTR2       equ $FE         ; $FE-$FF Pointer to user's Floating Point number 2
 ; $0100-$01FF Stack
 VDSLST      equ $0200       ; Vector to Display List Interrupt routine (Word)
 VSERIN      equ $020A
+VIMIRQ      equ $0216
+VVBLKI      equ $0222
 SDMCTL      equ $022F
 SDLSTL      equ $0230       ; Word
+SDLSTH      equ $0231
+GPRIOR      equ $026F
 STRIG0      equ $0284       ; 0 = Pressed, 1 = Released
 STRIG1      equ $0285       ; 0 = Pressed, 1 = Released
 STRIG2      equ $0286       ; 0 = Pressed, 1 = Released
@@ -124,7 +128,16 @@ SIZEP1      equ $D009
 SIZEP2      equ $D00A
 SIZEP3      equ $D00B
 SIZEM       equ $D00C
-GRAFP0      equ $D00D
+GRAFP0      equ $D00D       ; W
+P1PL        equ $D00D       ; R
+GRAFP1      equ $D00E       ; W
+P2PL        equ $D00E       ; R
+GRAFP2      equ $D00F       ; W
+P3PL        equ $D00F       ; R
+GRAFP3      equ $D010       ; W
+TRIG0       equ $D010       ; R
+GRAFM       equ $D011       ; W
+TRIG1       equ $D011       ; R
 COLPM0      equ $D012       ; Shadowed to $D012 -> $2C0 - $D01A -> $2C8
 COLPM1      equ $D013
 COLPM2      equ $D014
@@ -139,9 +152,14 @@ GRACTL      equ $D01D
 CONSOL      equ $D01F
 
 ; POKEY (D200-D2FF)
-KBCODE      equ $D209
+AUDF1       equ $D200   ; W
+POT0        equ $D200   ; R
+AUDC1       equ $D201
+STIMER      equ $D209   ; W
+KBCODE      equ $D209   ; R
 SKSTAT      equ $D20F
 RANDOM      equ $D20A
+IRQEN       equ $D20E
 
 ; PIA (D300-D3FF)
 PORTA       equ $D300
