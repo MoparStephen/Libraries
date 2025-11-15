@@ -1,6 +1,7 @@
 ; OS Vectors
 POKMSK      equ $10
 RTCLOK      equ $12         ; $12, $13, $14 are used
+SOUNDR      equ $41         ; 0 = quiet SIO, 1 = loud SIO
 CRITIC      equ $42
 ATRACT      equ $4D
 LMARGIN     equ $52
@@ -22,6 +23,8 @@ FCHRFLG     equ $F0         ; First character flag
 DIGRT       equ $F1         ; Number of digits to right of decimal
 CIX         equ $F2         ; Character Input indeX - offset into INBUFF
 INBUFF      equ $F3         ; $F3-$F4 Input ASCII pointer.  Result output buffer is $580-$5FF
+INBUFF_LO   equ $F3         ; $F3-$F4 Input ASCII pointer.  Result output buffer is $580-$5FF
+INBUFF_HI   equ $F4         ; $F3-$F4 Input ASCII pointer.  Result output buffer is $580-$5FF
 ZTEMP1      equ $F5         ; $F5-$F6 Temp register
 ZTEMP4      equ $F7         ; $F7-$F8 Temp register
 ZTEMP3      equ $F9         ; $F9-$FA Temp register
@@ -80,6 +83,7 @@ DBYTHI      equ $0309
 DAUX1       equ $030A
 DAUX2       equ $030B
 TIMER1      equ $030C       ; Word
+HATABS      equ $031A
 
 /*
 $0340-$034F: IOCB For Channel 0
@@ -94,7 +98,8 @@ $03B0-$03BF: IOCB For Channel 7
 
 ICHID       equ $0340       ; Index into device name
 ICDNO       equ $0341       ; Device #
-ICCOM       equ $0342       ; Command (also ICCMD)
+ICCOM       equ $0342       ; Command
+ICCMD       equ $0342       ; Command
 ICSTA       equ $0343       ; Most recent device status
 ICBAL       equ $0344       ; Buffer for data transfer or address of filename for OPEN
 ICBAH       equ $0345       ; Buffer for data transfer or address of filename for OPEN
