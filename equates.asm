@@ -1,15 +1,106 @@
 ; OS Vectors
+LINZBS      equ $00         ; Word
+CASINI      equ $02         ; Word
+RAMLO       equ $04         ; Word
+TRAMSZ      equ $06
+TSTDAT      equ $07
+WARMST      equ $08
+BOOT        equ $09
+DOSVEC      equ $0A         ; Word
+DOSINI      equ $0C         ; Word
+APPMHI      equ $0E         ; Word
 POKMSK      equ $10
+BRKKEY      EQU $11
 RTCLOK      equ $12         ; $12, $13, $14 are used
+BUFADR      equ $15         ; Word
+ICCOMT      equ $17
+DSKFMS      equ $18         ; Word
+DSKUTL      equ $1A         ; Word
+PTIMOT      equ $1C
+PBPNT       equ $1D
+PBUFSZ      equ $1E
+PTEMP       equ $1F
+ICHIDZ      equ $20
+ICDNOZ      equ $21
+ICCOMZ      equ $22
+ICSTAZ      equ $23
+ICBALZ      equ $24
+ICBAHZ      equ $25
+ICPTLZ      equ $26
+ICPTHZ      equ $27
+ICBLLZ      equ $28
+ICBLHZ      equ $29
+ICAX1Z      equ $2A
+ICAX2Z      equ $2B
+ICAX3Z      equ $2C
+ICAX4Z      equ $2D
+ICAX5Z      equ $2E
+ICAX6Z      equ $2F
+STATUS      equ $30
+CHKSUM      equ $31
+BUFRLO      equ $32
+BUFRHI      equ $33
+BFENLO      equ $34
+BFENHI      equ $35
+CRETRY      equ $36
+DRETRY      equ $37
+BUFRFL      equ $38
+RECVDN      equ $39
+XMTDON      equ $3A
+CHKSNT      equ $3B
+NOCKSUM     equ $3C
+BPTR        equ $3D
+FTYPE       equ $3E
+FEOF        equ $3F
+FREQ        equ $40
 SOUNDR      equ $41         ; 0 = quiet SIO, 1 = loud SIO
 CRITIC      equ $42
+FMZSPG      equ $43         ; 7 bytes FMS registers
+ZBUFP       equ $43         ; Word
+ZDRVA       equ $45         ; Word
+ZSBA        equ $47         ; Word
+ERRNO       equ $49
+CKEY        equ $4A
+CASSBT      equ $4B
+DSTAT       equ $4C
 ATRACT      equ $4D
+DRKMSK      equ $4E
+COLRSH      equ $4F
+TEMP        equ $50
+HOLD1       equ $51
 LMARGIN     equ $52
 RMARGIN     equ $53
 ROWCRS      equ $54
 COLCRS      equ $55         ; $55-$56
 DINDEX      equ $57         ; Display Mode
 SAVMSC      equ $58         ; $58-$59
+OLDROW      equ $5A
+OLDCOL      equ $5B         ; Word
+OLDCHR      equ $5D
+OLDADR      equ $5E         ; Word
+NEWROW      equ $60
+NEWCOL      equ $61         ; Word
+LOGCOL      equ $63
+ADRESS      equ $64         ; Word
+MLTTMP      equ $66         ; Word
+SAVADR      equ $68         ; Word
+RAMTOP      equ $6A
+BUFCNT      equ $6B
+BUFSTR      equ $6C         ; Word
+BITMSK      equ $6E
+SHFAMT      equ $6F
+ROLAC       equ $70         ; Word
+COLAC       equ $72         ; Word
+ENDPT       equ $74         ; Word
+DELATR      equ $76
+DELTAC      equ $77         ; Word
+ROWINC      equ $79
+COLINC      equ $7A
+SWPFLG      equ $7B
+HOLDCH      equ $7C
+INSDAT      equ $7D
+; Mapping Atari Page 26 Starts Here
+COUNTR      equ $7E         ; Word
 ; $D4-$FF reserved for Floating Point routines
 FR0         equ $D4         ; $D4-$D9 6-byte BCD Floating Point Register 0
 ; $DA-$DF free?
@@ -216,3 +307,6 @@ SIOV        equ $E459
 SETVBV      equ $E45C       ; Set system timers and interrupt vectors
 SYSVBV      equ $E45F       ; Stage one VBLANK calculations entry point
 XITVBV      equ $E462       ; Exit VBLANK routine entry point
+BLKBDV      equ $E471       ; Memo Pad Vector
+WARMSV      equ $E474       ; Warm Reset Vector
+COLDSV      equ $E477       ; Cold Reset Vector
