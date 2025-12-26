@@ -14,8 +14,8 @@ XIO_changedir	equ $29					; Change working directory (MyDOS)
 ; Mode of operation
 ;-----------------------------------------------------------------------------
 CIO_read     	equ $04					; Open to read
-CIO_write     	equ $08					; Open to write
 CIO_dir       	equ $06					; Get directory
+CIO_write     	equ $08					; Open to write
 
 ;-----------------------------------------------------------------------------
 ; Zero page variables for File I/O
