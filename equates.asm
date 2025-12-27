@@ -99,7 +99,10 @@ COLINC      equ $7A
 SWPFLG      equ $7B
 HOLDCH      equ $7C
 INSDAT      equ $7D
+;---------------------------------------
 ; Mapping Atari Page 26 Starts Here
+;      RESUME ENTERING DATA HERE
+;---------------------------------------
 COUNTR      equ $7E         ; Word
 ; $D4-$FF reserved for Floating Point routines
 FR0         equ $D4         ; $D4-$D9 6-byte BCD Floating Point Register 0
@@ -124,12 +127,38 @@ FLPTR       equ $FC         ; $FC-$FD Pointer to user's Floating Point number 1
 FPTR2       equ $FE         ; $FE-$FF Pointer to user's Floating Point number 2
 ; $0100-$01FF Stack
 VDSLST      equ $0200       ; Vector to Display List Interrupt routine (Word)
-VSERIN      equ $020A
-VIMIRQ      equ $0216
-VVBLKI      equ $0222
+VPRCED      equ $0202       ; Word
+VINTER      equ $0204       ; Word
+VBREAK      equ $0206       ; Word
+VKEYBD      equ $0208       ; Word
+VSERIN      equ $020A       ; Word
+VSEROR      equ $020C       ; Word
+VSEROC      equ $020E       ; Word
+VTIMR1      equ $0210       ; Word
+VTIMR2      equ $0212       ; Word
+VTIMR4      equ $0214       ; Word
+VIMIRQ      equ $0216       ; Word
+CDTMV1      equ $0218       ; Word
+CDTMV2      equ $021A       ; Word
+CDTMV3      equ $021C       ; Word
+CDTMV4      equ $021E       ; Word
+CDTMV5      equ $0220       ; Word
+VVBLKI      equ $0222       ; Word
+VVBLKD      equ $0224       ; Word
+CDTMA1      equ $0226       ; Word
+CDTMA2      equ $0228       ; Word
+CDTMF3      equ $022A
+SRTIMR      equ $022B
+CDTMF4      equ $022C
+INTEMP      equ $022D
+CDTMF5      equ $022E
 SDMCTL      equ $022F
 SDLSTL      equ $0230       ; Word
 SDLSTH      equ $0231
+;---------------------------------------
+; Mapping Atari Page 48 Starts Here
+;      RESUME ENTERING DATA HERE
+;---------------------------------------
 GPRIOR      equ $026F
 STRIG0      equ $0284       ; 0 = Pressed, 1 = Released
 STRIG1      equ $0285       ; 0 = Pressed, 1 = Released
