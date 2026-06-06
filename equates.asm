@@ -234,6 +234,8 @@ ICAX4       equ $034D       ; Auxiliary Byte 4
 ICAX5       equ $034E       ; Auxiliary Byte 5
 ICAX6       equ $034F       ; Auxiliary Byte 6
 
+BASICF      equ $03F8       ; Shadow for BASIC Status: 0 = ROM Enabled
+
 LINBUFF     equ $0580       ; FP ASCII output buffer, $580-$5FF
 
 ;-----------------------------------------------------------------------------

@@ -1,33 +1,3 @@
-;--------------------------------------------------------
-;		Constants for FileIO;
-;--------------------------------------------------------
-
-DSKINT	equ	$e453 ;disk drive SIO handler
-CIOMAIN equ	$e456 ;main CIO handler
-CIOV	equ	$e456 ;alias for CIOMAIN
-SIOINT	equ	$e459 ;main SIO handler
-SIOV	equ	$e459 ;alias for SIOINT
-SELFTST equ	$e471 ;SELF-TEST
-
-;IOCB Block
-IOCB	equ	$340 ;IO channels (8*16 bytes)
-ICHID	equ	$340 ;device id - index in HATABS. $ff == not opened
-ICDNO	equ	$341 ;# of device set by OS, eg. 2 for D2:
-ICCMD	equ	$342 ;command for device
-ICSTA	equ	$343 ;last operation status code
-ICBUFA	equ	$344 ;address of device name to open
-ICPTL	equ	$346 ;address of procedure call that sends one byte to device decreased by 1
-ICBUFL	equ	$348 ;length of the buffer containing transmitted data
-ICAUX1	equ	$34a ;auxilary byte #1, usually containing second parameter for OPEN command
-ICAUX2	equ	$34b ;auxilary byte #2, third parameter for OPEN command
-ICAUX3	equ	$34c ;remaining auxilary bytes
-ICAUX4	equ	$34d
-ICAUX5	equ	$34e
-ICAUX6	equ	$34f
-
-;HATABS
-HATABS	equ	0x031A
-
 ;basic CIO commands (ICCOM)
 CIO_open		equ 3	;OPEN command for IOCB channell
 CIO_gettext		equ 5	;READ of text line
@@ -149,11 +119,11 @@ PutLine_IOCB_Found
 	lda	#CIO_puttext
 	sta	iccmd,x
 	lda	#255
-	sta	icbufl,x
+	sta	ICBLL,x
 	lda	TextPtr
-	sta	icbufa,x
+	sta	ICBAL,x
 	lda	TextPtr+1
-	sta	icbufa+1,x
+	sta	ICBAL+1,x
 	jsr	ciov
 PutLine_Error
 	rts
@@ -175,24 +145,24 @@ SetGraphicsMode
 	beq	SetGraphicsMode_VBXE	; VBXE device handler is S2:, so we need special case for it :(
 	sta	Temporary_Handler
 	lda	#<Temporary_Handler
-	sta	icbufa,x
+	sta	ICBAL,x
 	lda	#>Temporary_Handler
-	sta	icbufa+1,x
+	sta	ICBAL+1,x
 SetGraphicsMode_Common
 	tya
-	sta	icaux2,x		; mode to obtain
+	sta	ICAX2,x		; mode to obtain
 	lda	#CIO_open	
 	sta	iccmd,x
 	lda	#CIO_read|CIO_write	; for both READ and WRITE operations
-	sta	icaux1,x
+	sta	ICAX1,x
 	jsr	ciov
 SetGraphicsMode_Error
 	rts
 SetGraphicsMode_VBXE
 	lda	#<VBXE_Handler
-	sta	icbufa,x
+	sta	ICBAL,x
 	lda	#>VBXE_Handler
-	sta	icbufa+1,x
+	sta	ICBAL+1,x
 	jmp	SetGraphicsMode_Common
 	
 ;--------------------------------------------------------
@@ -208,17 +178,17 @@ LoadData
 	cpy	#1
 	bne	LoadData_Error
 	lda	#CIO_read
-	sta	icaux1,x
+	sta	ICAX1,x
 	lda	#CIO_open
 	sta	iccmd,x
 	lda	FileNamePtr
-	sta	icbufa,x
+	sta	ICBAL,x
 	lda	FileNamePtr+1
-	sta	icbufa+1,x
+	sta	ICBAL+1,x
 	lda	FileNameLng
-	sta	icbufl,x
+	sta	ICBLL,x
 	lda	#0
-	sta	icbufl+1,x
+	sta	ICBLL+1,x
 	jsr	ciov
 	bmi	LoadData_Error
 	ldy	BankIndex
@@ -228,17 +198,17 @@ LoadData_l1
 	vbsta	VBXE_MA_BSEL
 	;loading block of data to banked memory
 	lda	#CIO_read
-	sta	icaux1,x
+	sta	ICAX1,x
 	lda	#CIO_getdata		;getbyte
 	sta	iccmd,x
 	lda	<VBXE_WINDOW
-	sta icbufa,x
+	sta ICBAL,x
 	lda	>VBXE_WINDOW
-	sta	icbufa+1,x
+	sta	ICBAL+1,x
 	lda	<0x1000
-	sta	icbufl,x
+	sta	ICBLL,x
 	lda	>0x1000
-	sta	icbufl+1,x
+	sta	ICBLL+1,x
 	jsr	ciov
 	bmi	LoadData_Close
 	inc	BankIndex
