@@ -1,9 +1,9 @@
 
-.if .not .def __VBXE_AUTO__ .and .not .def __VBXE_D700__	; default case - vbxe at 0xd640
+.if .not .def __VBXE_AUTO__ .and .not .def __VBXE_D700__	; Default case - vbxe at 0xd640
 VBXE_BASE		equ	0xd600
-.elseif .not .def __VBXE_AUTO__ .and def __VBXE_D700__		; vbxe is assumed to be under 0xd740
+.elseif .not .def __VBXE_AUTO__ .and def __VBXE_D700__	; Vbxe is assumed to be under 0xd740
 VBXE_BASE		equ	0xd700
-.else								; vbxe should be autodetected
+.else									; Vbxe should be autodetected
 VBXE_BASE		equ	0x0000
 .endif
 
@@ -29,9 +29,9 @@ VBXE_BLITTER_START	equ	VBXE_BASE+0x53
 VBXE_BLITTER_BUSY	equ	VBXE_BASE+0x53
 VBXE_IRQ_CONTROL	equ	VBXE_BASE+0x54
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;		Structures for VBXE
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 .struct BLTBLK	
 	orgin_ptr	.long
 	ostep_y		.word
@@ -49,22 +49,22 @@ VBXE_IRQ_CONTROL	equ	VBXE_BASE+0x54
 	control		.byte
 .ends
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;		Zero page variables for VBXE
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 .zpvar	VBXEBase	.word
 .zpvar	Y_Register	.byte
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;		Other variables for VBXE
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 .var	Pal_ptr		.word
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;		Macro definitions for VBXE
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;vblda	- loads accumulator with VBXE register value
 ;	  use:	vblda	VBXE_REGISTER
 
@@ -79,7 +79,7 @@ vblda_adr	equ *-1
 .endif
 .endm
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;vbsta	- stores accumulator in VBXE register
 ;	  use:	vbsta	VBXE_REGISTER
 
@@ -96,27 +96,27 @@ vbsta_adr	equ *-1
 .endif
 .endm
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;		Common calls for VBXE
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ;VBXE_Detect - detects VBXE FX core version 1.07 and above,
 ; and stores VBXE Base address in VBXEBase
 VBXE_Detect
 	lda	#0
 	ldx	#0xd6
-	sta	0xd640			; make sure it isn't coincidence
+	sta	0xd640							; Make sure it isn't coincidence
 	lda	0xd640
-	cmp	#0x10			; do we have major version here?
-	beq	VBXE_Detected	; if so, then VBXE is detected
+	cmp	#0x10							; Do we have major version here?
+	beq	VBXE_Detected					; If so, then VBXE is detected
 	lda	#0
 	inx
-	sta	0xd740			; no such luck, try other location
+	sta	0xd740							; No such luck, try other location
 	lda	0xd740
 	cmp	#0x10
 	beq	VBXE_Detected
-	ldx 	#0  		; not here, so not present or FX core version too low
+	ldx 	#0							; Not here, so not present or FX core version too low
 	stx	VBXEBase+1
 	stx	VBXEBase
 	sec
@@ -125,11 +125,11 @@ VBXE_Detected:
 	stx	VBXEBase+1
 	lda	#0
 	sta	VBXEBase
-	vblda	VBXE_MINOR	; get core minor version
-	clc	 				; x - page of vbxe
+	vblda	VBXE_MINOR					; Get core minor version
+	clc									; X - page of vbxe
 	rts
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ; VBXE_SetPalette - sets palette
 ;	A		- color to start with
 ;	X		- palette number
@@ -137,11 +137,11 @@ VBXE_Detected:
 ; NOTE: This code cannot run from ROM
 ;       The palette is stored as 256R, 256G, 256B bytes for easy loading
 VBXE_SetPalette
-	vbsta	VBXE_CSEL			; start from color index A
+	vbsta	VBXE_CSEL					; Start from color index A
 	txa
-	vbsta	VBXE_PSEL			; select the palette to alter
+	vbsta	VBXE_PSEL					; Select the palette to alter
 	lda	Pal_ptr
-	sta	VBXE_SetPalette_pal1	; setup self-modyfying code
+	sta	VBXE_SetPalette_pal1			; Setup self-modyfying code
 	sta	VBXE_SetPalette_pal2
 	sta	VBXE_SetPalette_pal3
 	ldx	Pal_ptr+1
@@ -154,64 +154,64 @@ VBXE_SetPalette
 VBXE_SetPalette_l1
 	lda	0x55AA,x
 VBXE_SetPalette_pal1	equ *-2
-	sta	VBXE_CR			; set the red component,
+	sta	VBXE_CR							; Set the red component,
 	lda	0x56AA,x
 VBXE_SetPalette_pal2	equ *-2
-	sta	VBXE_CG			; green component,
+	sta	VBXE_CG							; Green component,
 	lda	0x57AA,x
 VBXE_SetPalette_pal3	equ *-2
-	sta	VBXE_CB			; blue component, and auto-increment color index
+	sta	VBXE_CB							; Blue component, and auto-increment color index
 	inx
 	bne	VBXE_SetPalette_l1
 	rts
 
-;--------------------------------------------------------
+;-----------------------------------------------------------------------------
 ; VBXE_SetPalette2 - sets palette
 ;	A			- palette number
 ;	Y_Register	- palette pointer - Data MUST be page aligned
 ; NOTE: This code can run from ROM
 ;       The palette is stored as 256 RGB triplets
 VBXE_SetPalette2
-	vbsta VBXE_PSEL				; Set Palette #
+	vbsta VBXE_PSEL						; Set Palette #
 	lda #0
-	vbsta VBXE_CSEL				; Start at colour 0
+	vbsta VBXE_CSEL						; Start at colour 0
 
 	tay
 LoadPal1_1 lda (Y_Register),y
-	sta	VBXE_CR					; set the red component
+	sta	VBXE_CR							; Set the red component
 	iny
-	beq OverFlow1				; since 256 / 3 is not even, we must skip to next section and resume at CG
+	beq OverFlow1						; Since 256 / 3 is not even, we must skip to next section and resume at CG
 	lda (Y_Register),y
-	sta	VBXE_CG					; set the green component
+	sta	VBXE_CG							; Set the green component
 	iny
 	lda (Y_Register),y
-	sta	VBXE_CB					; set the blue component and increment CSEL
+	sta	VBXE_CB							; Set the blue component and increment CSEL
 	iny
-	bne	LoadPal1_1				; copy a page
+	bne	LoadPal1_1						; Copy a page
 LoadPal1_2 lda (Y_Register),y
-	sta	VBXE_CR					; set the red component
+	sta	VBXE_CR							; Set the red component
 	iny
 	beq LoadPal1_3
 LP1_2_G
 	lda (Y_Register),y
-	sta	VBXE_CG					; set the green component
+	sta	VBXE_CG							; Set the green component
 	iny
-	beq OverFlow2				; since 256 / 3 is not even, we must skip to next section and resume at CB
+	beq OverFlow2						; Since 256 / 3 is not even, we must skip to next section and resume at CB
 	lda (Y_Register),y
-	sta	VBXE_CB					; set the blue component and increment CSEL
+	sta	VBXE_CB							; Set the blue component and increment CSEL
 	iny
-	bne	LoadPal1_2				; copy a page
+	bne	LoadPal1_2						; Copy a page
 LoadPal1_3 lda (Y_Register),y
-	sta	VBXE_CR					; set the red component
+	sta	VBXE_CR							; Set the red component
 	iny
 	lda (Y_Register),y
-	sta	VBXE_CG					; set the green component
+	sta	VBXE_CG							; Set the green component
 	iny
 LP1_3_B
 	lda (Y_Register),y
-	sta	VBXE_CB					; set the blue component and increment CSEL
+	sta	VBXE_CB							; Set the blue component and increment CSEL
 	iny
-	bne	LoadPal1_3				; copy a page
+	bne	LoadPal1_3						; Copy a page
 	rts
 
 OverFlow1

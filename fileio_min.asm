@@ -105,7 +105,7 @@ PutLine
 	cpy	#$01
 	beq	PutLine_IOCB_Found
 	lda	#'E'							; Open through console handler
-	ldy	#$00								; Mode 0 - standard text console
+	ldy	#$00							; Mode 0 - standard text console
 	jsr	SetGraphicsMode
 PutLine_IOCB_Open
 PutLine_IOCB_Found

@@ -1,19 +1,19 @@
 ;basic CIO commands (ICCOM)
-CIO_open		equ 3	;OPEN command for IOCB channell
-CIO_gettext		equ 5	;READ of text line
-CIO_getdata		equ 7	;READ of binary data
-CIO_puttext		equ 9	;WRITE of text line
-CIO_putdata		equ 11	;WRITE of binary data
-CIO_close    	equ 12	;CLOSE of IOCB channel
-CIO_getstatus	equ 13	;READ of device status
+CIO_open		equ 3					;OPEN command for IOCB channell
+CIO_gettext		equ 5					;READ of text line
+CIO_getdata		equ 7					;READ of binary data
+CIO_puttext		equ 9					;WRITE of text line
+CIO_putdata		equ 11					;WRITE of binary data
+CIO_close    	equ 12					;CLOSE of IOCB channel
+CIO_getstatus	equ 13					;READ of device status
 
 ;some dos specific XIO commands (ICCOM)
-XIO_changedir	equ 41	;Change working directory (MyDOS)
+XIO_changedir	equ 41					;Change working directory (MyDOS)
 
 ;mode of operation (ICAX1) for OPEN
-CIO_read     	equ 4  ;open to read
-CIO_write     	equ 8  ;open to write
-CIO_dir       	equ 6  ;get directory
+CIO_read     	equ 4					;open to read
+CIO_write     	equ 8					;open to write
+CIO_dir       	equ 6					;get directory
 
 ;--------------------------------------------------------
 ;		Zero page variables for FileIO;
@@ -28,7 +28,7 @@ CIO_dir       	equ 6  ;get directory
 .var	FileNamePtr	.word
 .var	FileNameLng .byte
 .var	TextPtr		.word
-.var	LoadStatus	.byte	; $0 = failure, $1 = Success
+.var	LoadStatus	.byte				; $0 = failure, $1 = Success
 Console_IOCB		.byte 0xFF
 Temporary_Handler	.byte ' :',0x9B,0x00
 VBXE_Handler		.byte 'S2:',0x9B,0x00
@@ -65,13 +65,13 @@ Find_Matching_IOCB
 Find_Matching_IOCB_l1
 	lda	ICHID,x
 	jsr	Get_HATABS_Entry
-	cmp	AR_Temp		; compare device ID with the one searched
+	cmp	AR_Temp							; Compare device ID with the one searched
 	beq	Find_Matching_IOCB_Found
 	txa
-	add	#0x10		; add IOCB structure length to x pointer, and try next channel
+	add	#0x10							; Add IOCB structure length to x pointer, and try next channel
 	tax
 	bpl	Find_Matching_IOCB_l1
-	ldy	#-126		; if fails, change error code to "NONEXISTENT DEVICE"	
+	ldy	#-126							; If fails, change error code to "NONEXISTENT DEVICE"	
 Find_Matching_IOCB_Found
 	rts
 
@@ -85,17 +85,17 @@ Find_Matching_IOCB_Found
 ; there are no references for its orgins
 
 Find_First_IOCB
-	ldx	#0x00		; start with channel #0
-	ldy	#0x01		; set the error code to #1 - success
+	ldx	#0x00							; Start with channel #0
+	ldy	#0x01							; Set the error code to #1 - success
 Find_First_IOCB_l1
-	lda	ICHID,x		; get the device ID
-	cmp	#0xff		; if equals to 0xff - channel is not opened
+	lda	ICHID,x							; Get the device ID
+	cmp	#0xff							; If equals to 0xff - channel is not opened
 	beq	Find_First_IOCB_found
 	txa
-	add	#0x10		; add IOCB structure length to x pointer, and try next channel
+	add	#0x10							; Add IOCB structure length to x pointer, and try next channel
 	tax
 	bpl	Find_First_IOCB_l1
-	ldy	#-95       	;if fails, change error code to "TOO MANY CHANNELS OPEN"	
+	ldy	#-95							;if fails, change error code to "TOO MANY CHANNELS OPEN"	
 Find_First_IOCB_found
 	rts
 
@@ -111,8 +111,8 @@ PutLine
 	jsr	Find_Matching_IOCB
 	cpy	#1
 	beq	PutLine_IOCB_Found
-	lda	#'E'		; open through console handler
-	ldy	#0		; Mode 0 - standard text console
+	lda	#'E'							; Open through console handler
+	ldy	#0								; Mode 0 - standard text console
 	jsr	SetGraphicsMode
 PutLine_IOCB_Open
 PutLine_IOCB_Found
@@ -138,11 +138,11 @@ PutLine_Error
 ; Y - error code (95 - too many channels open) if it fails
 
 SetGraphicsMode
-	jsr	Find_First_IOCB		; find first free IOCB
+	jsr	Find_First_IOCB					; Find first free IOCB
 	cpy	#1
-	bne	SetGraphicsMode_Error	; no more free IOCB
+	bne	SetGraphicsMode_Error			; No more free IOCB
 	cmp	#'V'
-	beq	SetGraphicsMode_VBXE	; VBXE device handler is S2:, so we need special case for it :(
+	beq	SetGraphicsMode_VBXE			; VBXE device handler is S2:, so we need special case for it :(
 	sta	Temporary_Handler
 	lda	#<Temporary_Handler
 	sta	ICBAL,x
@@ -150,10 +150,10 @@ SetGraphicsMode
 	sta	ICBAL+1,x
 SetGraphicsMode_Common
 	tya
-	sta	ICAX2,x		; mode to obtain
+	sta	ICAX2,x							; Mode to obtain
 	lda	#CIO_open	
 	sta	iccmd,x
-	lda	#CIO_read|CIO_write	; for both READ and WRITE operations
+	lda	#CIO_read|CIO_write				; For both READ and WRITE operations
 	sta	ICAX1,x
 	jsr	ciov
 SetGraphicsMode_Error
@@ -173,7 +173,7 @@ SetGraphicsMode_VBXE
 ; to see the original version
 LoadData
 	lda #1
-	sta LoadStatus	; Indicate Failure
+	sta LoadStatus						; Indicate Failure
 	jsr	Find_First_IOCB
 	cpy	#1
 	bne	LoadData_Error
@@ -199,7 +199,7 @@ LoadData_l1
 	;loading block of data to banked memory
 	lda	#CIO_read
 	sta	ICAX1,x
-	lda	#CIO_getdata		;getbyte
+	lda	#CIO_getdata					;getbyte
 	sta	iccmd,x
 	lda	<VBXE_WINDOW
 	sta ICBAL,x
@@ -227,5 +227,5 @@ LoadData_Close
 	rts
 LoadData_Error
 	lda #0
-	sta LoadStatus	; Indicate Failure
+	sta LoadStatus						; Indicate Failure
 	rts

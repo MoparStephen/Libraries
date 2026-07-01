@@ -153,7 +153,7 @@ frqtabbasslo
 	EIF
 		org PLAYER-$100-$100
 frqtab
-	ERT [<frqtab]!=0	;* frqtab must begin at the memory page bound! (i.e. $..00 address)
+	ERT [<frqtab]!=0					;* frqtab must begin at the memory page bound! (i.e. $..00 address)
 frqtabbass1
 	dta $BF,$B6,$AA,$A1,$98,$8F,$89,$80,$F2,$E6,$DA,$CE,$BF,$B6,$AA,$A1
 	dta $98,$8F,$89,$80,$7A,$71,$6B,$65,$5F,$5C,$56,$50,$4D,$47,$44,$3E
@@ -205,7 +205,7 @@ RASTERMUSICTRACKER
 	jmp rmt_silence
 	jmp SetPokey
 	IFT FEAT_SFX
-	jmp rmt_sfx			;* A=note(0,..,60),X=channel(0,..,3 or 0,..,7),Y=instrument*2(0,2,4,..,126)
+	jmp rmt_sfx							;* A=note(0,..,60),X=channel(0,..,3 or 0,..,7),Y=instrument*2(0,2,4,..,126)
 	EIF
 rmt_init
 	stx ns
@@ -480,8 +480,8 @@ rmt_sfx
 	IFT FEAT_BASS16
 	sta trackn_outnote,x
 	EIF
-	lda #$f0				;* sfx note volume*16
-RMTSFXVOLUME equ *-1		;* label for sfx note volume parameter overwriting
+	lda #$f0							;* sfx note volume*16
+RMTSFXVOLUME equ *-1					;* label for sfx note volume parameter overwriting
 	sta trackn_volume,x
 	EIF
 SetUpInstrumentY2
@@ -1245,7 +1245,7 @@ v_ainstrspeed equ *-1
 	EIF
 	rts
 SetPokey
-	IFT STEREOMODE==1		;* L1 L2 L3 L4 R1 R2 R3 R4
+	IFT STEREOMODE==1					;* L1 L2 L3 L4 R1 R2 R3 R4
 	ldy #$ff
 v_audctl2 equ *-1
 	lda trackn_audf+0+4
@@ -1284,7 +1284,7 @@ xstastx08	sta $d217
 v_audctl equ *-1
 xstysta01	sty $d218
 	sta $d208
-	ELI STEREOMODE==0		;* L1 L2 L3 L4
+	ELI STEREOMODE==0					;* L1 L2 L3 L4
 	ldy #$ff
 v_audctl equ *-1
 	lda trackn_audf+0
@@ -1304,7 +1304,7 @@ v_audctl equ *-1
 	sta $d200+6
 	stx $d201+6
 	sty $d208
-	ELI STEREOMODE==2		;* L1 R2 R3 L4
+	ELI STEREOMODE==2					;* L1 R2 R3 L4
 	ldy #$ff
 v_audctl equ *-1
 	lda trackn_audf+0
@@ -1328,7 +1328,7 @@ v_audctl equ *-1
 	sta $d210+6
 	sty $d218
 	sty $d208
-	ELI STEREOMODE==3		;* L1 L2 R3 R4
+	ELI STEREOMODE==3					;* L1 L2 R3 R4
 	ldy #$ff
 v_audctl equ *-1
 	lda trackn_audf+0
