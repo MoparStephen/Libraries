@@ -44,10 +44,10 @@ VBXE_Handler		.byte 'S2:',0x9B,0x00
 ; returns:
 ; A - letter identificator of the handler
 Get_HATABS_Entry
-	stx	XR_Temp
+	stx XR_Temp
 	tax
-	lda	HATABS,x
-	ldx	XR_Temp
+	lda HATABS,x
+	ldx XR_Temp
 	rts
 	
 ;--------------------------------------------------------
@@ -59,19 +59,19 @@ Get_HATABS_Entry
 ; Y - error code (126 - nonexistent device) if it fails
 
 Find_Matching_IOCB
-	sta	AR_Temp
-	ldx	#0x00
-	ldy	#0x01
+	sta AR_Temp
+	ldx #0x00
+	ldy #0x01
 Find_Matching_IOCB_l1
-	lda	ICHID,x
-	jsr	Get_HATABS_Entry
-	cmp	AR_Temp							; Compare device ID with the one searched
-	beq	Find_Matching_IOCB_Found
+	lda ICHID,x
+	jsr Get_HATABS_Entry
+	cmp AR_Temp							; Compare device ID with the one searched
+	beq Find_Matching_IOCB_Found
 	txa
-	add	#0x10							; Add IOCB structure length to x pointer, and try next channel
+	add #0x10							; Add IOCB structure length to x pointer, and try next channel
 	tax
-	bpl	Find_Matching_IOCB_l1
-	ldy	#-126							; If fails, change error code to "NONEXISTENT DEVICE"	
+	bpl Find_Matching_IOCB_l1
+	ldy #-126							; If fails, change error code to "NONEXISTENT DEVICE"	
 Find_Matching_IOCB_Found
 	rts
 
@@ -85,17 +85,17 @@ Find_Matching_IOCB_Found
 ; there are no references for its orgins
 
 Find_First_IOCB
-	ldx	#0x00							; Start with channel #0
-	ldy	#0x01							; Set the error code to #1 - success
+	ldx #0x00							; Start with channel #0
+	ldy #0x01							; Set the error code to #1 - success
 Find_First_IOCB_l1
-	lda	ICHID,x							; Get the device ID
-	cmp	#0xff							; If equals to 0xff - channel is not opened
-	beq	Find_First_IOCB_found
+	lda ICHID,x							; Get the device ID
+	cmp #0xff							; If equals to 0xff - channel is not opened
+	beq Find_First_IOCB_found
 	txa
-	add	#0x10							; Add IOCB structure length to x pointer, and try next channel
+	add #0x10							; Add IOCB structure length to x pointer, and try next channel
 	tax
-	bpl	Find_First_IOCB_l1
-	ldy	#-95							;if fails, change error code to "TOO MANY CHANNELS OPEN"	
+	bpl Find_First_IOCB_l1
+	ldy #-95							;if fails, change error code to "TOO MANY CHANNELS OPEN"	
 Find_First_IOCB_found
 	rts
 
@@ -104,27 +104,27 @@ Find_First_IOCB_found
 ; line should end with ENTER (0x9b)
 PutLine
 ;	brk
-	ldx	Console_IOCB
-	cpx	#255
-	bne	PutLine_IOCB_Open
-	lda	#'E'
-	jsr	Find_Matching_IOCB
-	cpy	#1
-	beq	PutLine_IOCB_Found
-	lda	#'E'							; Open through console handler
-	ldy	#0								; Mode 0 - standard text console
-	jsr	SetGraphicsMode
+	ldx Console_IOCB
+	cpx #255
+	bne PutLine_IOCB_Open
+	lda #'E'
+	jsr Find_Matching_IOCB
+	cpy #1
+	beq PutLine_IOCB_Found
+	lda #'E'							; Open through console handler
+	ldy #0								; Mode 0 - standard text console
+	jsr SetGraphicsMode
 PutLine_IOCB_Open
 PutLine_IOCB_Found
-	lda	#CIO_puttext
-	sta	iccmd,x
-	lda	#255
-	sta	ICBLL,x
-	lda	TextPtr
-	sta	ICBAL,x
-	lda	TextPtr+1
-	sta	ICBAL+1,x
-	jsr	ciov
+	lda #CIO_puttext
+	sta iccmd,x
+	lda #255
+	sta ICBLL,x
+	lda TextPtr
+	sta ICBAL,x
+	lda TextPtr+1
+	sta ICBAL+1,x
+	jsr ciov
 PutLine_Error
 	rts
 	
@@ -138,32 +138,32 @@ PutLine_Error
 ; Y - error code (95 - too many channels open) if it fails
 
 SetGraphicsMode
-	jsr	Find_First_IOCB					; Find first free IOCB
-	cpy	#1
-	bne	SetGraphicsMode_Error			; No more free IOCB
-	cmp	#'V'
-	beq	SetGraphicsMode_VBXE			; VBXE device handler is S2:, so we need special case for it :(
-	sta	Temporary_Handler
-	lda	#<Temporary_Handler
-	sta	ICBAL,x
-	lda	#>Temporary_Handler
-	sta	ICBAL+1,x
+	jsr Find_First_IOCB					; Find first free IOCB
+	cpy #1
+	bne SetGraphicsMode_Error			; No more free IOCB
+	cmp #'V'
+	beq SetGraphicsMode_VBXE			; VBXE device handler is S2:, so we need special case for it :(
+	sta Temporary_Handler
+	lda #<Temporary_Handler
+	sta ICBAL,x
+	lda #>Temporary_Handler
+	sta ICBAL+1,x
 SetGraphicsMode_Common
 	tya
-	sta	ICAX2,x							; Mode to obtain
-	lda	#CIO_open	
-	sta	iccmd,x
-	lda	#CIO_read|CIO_write				; For both READ and WRITE operations
-	sta	ICAX1,x
-	jsr	ciov
+	sta ICAX2,x							; Mode to obtain
+	lda #CIO_open	
+	sta iccmd,x
+	lda #CIO_read|CIO_write				; For both READ and WRITE operations
+	sta ICAX1,x
+	jsr ciov
 SetGraphicsMode_Error
 	rts
 SetGraphicsMode_VBXE
-	lda	#<VBXE_Handler
-	sta	ICBAL,x
-	lda	#>VBXE_Handler
-	sta	ICBAL+1,x
-	jmp	SetGraphicsMode_Common
+	lda #<VBXE_Handler
+	sta ICBAL,x
+	lda #>VBXE_Handler
+	sta ICBAL+1,x
+	jmp SetGraphicsMode_Common
 	
 ;--------------------------------------------------------
 ; LoadData - Loads file into banked memory
@@ -174,55 +174,55 @@ SetGraphicsMode_VBXE
 LoadData
 	lda #1
 	sta LoadStatus						; Indicate Failure
-	jsr	Find_First_IOCB
-	cpy	#1
-	bne	LoadData_Error
-	lda	#CIO_read
-	sta	ICAX1,x
-	lda	#CIO_open
-	sta	iccmd,x
-	lda	FileNamePtr
-	sta	ICBAL,x
-	lda	FileNamePtr+1
-	sta	ICBAL+1,x
-	lda	FileNameLng
-	sta	ICBLL,x
-	lda	#0
-	sta	ICBLL+1,x
-	jsr	ciov
-	bmi	LoadData_Error
-	ldy	BankIndex
+	jsr Find_First_IOCB
+	cpy #1
+	bne LoadData_Error
+	lda #CIO_read
+	sta ICAX1,x
+	lda #CIO_open
+	sta iccmd,x
+	lda FileNamePtr
+	sta ICBAL,x
+	lda FileNamePtr+1
+	sta ICBAL+1,x
+	lda FileNameLng
+	sta ICBLL,x
+	lda #0
+	sta ICBLL+1,x
+	jsr ciov
+	bmi LoadData_Error
+	ldy BankIndex
 LoadData_l1
 	tya
-	ora	#0x80
-	vbsta	VBXE_MA_BSEL
+	ora #0x80
+	vbsta VBXE_MA_BSEL
 	;loading block of data to banked memory
-	lda	#CIO_read
-	sta	ICAX1,x
-	lda	#CIO_getdata					;getbyte
-	sta	iccmd,x
-	lda	<VBXE_WINDOW
+	lda #CIO_read
+	sta ICAX1,x
+	lda #CIO_getdata					;getbyte
+	sta iccmd,x
+	lda <VBXE_WINDOW
 	sta ICBAL,x
-	lda	>VBXE_WINDOW
-	sta	ICBAL+1,x
-	lda	<0x1000
-	sta	ICBLL,x
-	lda	>0x1000
-	sta	ICBLL+1,x
-	jsr	ciov
-	bmi	LoadData_Close
-	inc	BankIndex
-	ldy	BankIndex
-	cpy	#127
-	bcc	LoadData_l1
+	lda >VBXE_WINDOW
+	sta ICBAL+1,x
+	lda <0x1000
+	sta ICBLL,x
+	lda >0x1000
+	sta ICBLL+1,x
+	jsr ciov
+	bmi LoadData_Close
+	inc BankIndex
+	ldy BankIndex
+	cpy #127
+	bcc LoadData_l1
 LoadData_Close
 	php
 	;at the end disable vbxe memory window
-	lda	#0
-	vbsta	VBXE_MA_BSEL
-	lda	#CIO_close
-	sta	iccmd,x
-	jsr	ciov
+	lda #0
+	vbsta VBXE_MA_BSEL
+	lda #CIO_close
+	sta iccmd,x
+	jsr ciov
 	plp
 	rts
 LoadData_Error

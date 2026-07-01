@@ -76,20 +76,20 @@ MEMAC_GLOBAL_ENABLE		equ	$80
 ; Structures for VBXE
 ;-----------------------------------------------------------------------------
 .struct BLTBLK	
-	orgin_ptr	.long
-	ostep_y		.word
-	ostep_x		.byte
-	dest_ptr	.long
-	dstep_y		.word
-	dstep_x		.byte
-	width		.word
-	height		.byte
-	and_mask	.byte
-	xor_mask	.byte
-	col_mask	.byte
-	zoom		.byte
-	pattern		.byte
-	control		.byte
+	orgin_ptr .long
+	ostep_y .word
+	ostep_x .byte
+	dest_ptr .long
+	dstep_y .word
+	dstep_x .byte
+	width .word
+	height .byte
+	and_mask .byte
+	xor_mask .byte
+	col_mask .byte
+	zoom .byte
+	pattern .byte
+	control .byte
 .ends
 
 ;-----------------------------------------------------------------------------
@@ -113,12 +113,12 @@ MEMAC_GLOBAL_ENABLE		equ	$80
 
 vblda	.macro
 .ifdef	__VBXE_AUTO__
-	lda	VBXEBase+1
-	sta	vblda_adr
-	lda.w	:1
+	lda VBXEBase+1
+	sta vblda_adr
+	lda.w :1
 vblda_adr	equ *-1
 .else
-	lda	:1
+	lda :1
 .endif
 .endm
 
@@ -129,13 +129,13 @@ vblda_adr	equ *-1
 vbsta	.macro
 .ifdef	__VBXE_AUTO__
 	pha
-	lda	VBXEBase+1
-	sta	vbsta_adr
+	lda VBXEBase+1
+	sta vbsta_adr
 	pla
-	sta.w	:1
+	sta.w :1
 vbsta_adr	equ *-1
 .else
-	sta.w	:1
+	sta.w :1
 .endif
 .endm
 
@@ -147,28 +147,28 @@ vbsta_adr	equ *-1
 ;VBXE_Detect - detects VBXE FX core version 1.07 and above,
 ; and stores VBXE Base address in VBXEBase
 VBXE_Detect
-	lda	#$00
-	ldx	#$D6
-	sta	$D640							; Make sure it isn't coincidence
-	lda	$D640
-	cmp	#$10							; Do we have major version here?
-	beq	VBXE_Detected					; If so, then VBXE is detected
-	lda	#$00
+	lda #$00
+	ldx #$D6
+	sta $D640							; Make sure it isn't coincidence
+	lda $D640
+	cmp #$10							; Do we have major version here?
+	beq VBXE_Detected					; If so, then VBXE is detected
+	lda #$00
 	inx
-	sta	$D740							; No such luck, try other location
-	lda	$D740
-	cmp	#$10
-	beq	VBXE_Detected
-	ldx 	#$00						; Not here, so not present or FX core version too low
-	stx	VBXEBase+1
-	stx	VBXEBase
+	sta $D740							; No such luck, try other location
+	lda $D740
+	cmp #$10
+	beq VBXE_Detected
+	ldx #$00							; Not here, so not present or FX core version too low
+	stx VBXEBase+1
+	stx VBXEBase
 	sec
 	rts
 VBXE_Detected:
-	stx	VBXEBase+1
-	lda	#$00
-	sta	VBXEBase
-	vblda	VBXE_MINOR					; Get core minor version
+	stx VBXEBase+1
+	lda #$00
+	sta VBXEBase
+	vblda VBXE_MINOR					; Get core minor version
 	clc									; X - page of VBXE
 	rts
 
@@ -185,40 +185,40 @@ VBXE_SetPalette2
 
 	tay
 LoadPal1_1 lda (Y_Register),y
-	vbsta	VBXE_CR						; Set the red component
+	vbsta VBXE_CR						; Set the red component
 	iny
 	beq OverFlow1						; Since 256 / 3 is not even, we must skip to next section and resume at CG
 	lda (Y_Register),y
-	vbsta	VBXE_CG						; Set the green component
+	vbsta VBXE_CG						; Set the green component
 	iny
 	lda (Y_Register),y
-	vbsta	VBXE_CB						; Set the blue component and increment CSEL
+	vbsta VBXE_CB						; Set the blue component and increment CSEL
 	iny
-	bne	LoadPal1_1						; Copy a page
+	bne LoadPal1_1						; Copy a page
 LoadPal1_2 lda (Y_Register),y
-	vbsta	VBXE_CR						; Set the red component
+	vbsta VBXE_CR						; Set the red component
 	iny
 	beq LoadPal1_3
 LP1_2_G
 	lda (Y_Register),y
-	vbsta	VBXE_CG						; Set the green component
+	vbsta VBXE_CG						; Set the green component
 	iny
 	beq OverFlow2						; Since 256 / 3 is not even, we must skip to next section and resume at CB
 	lda (Y_Register),y
-	vbsta	VBXE_CB						; Set the blue component and increment CSEL
+	vbsta VBXE_CB						; Set the blue component and increment CSEL
 	iny
-	bne	LoadPal1_2						; Copy a page
+	bne LoadPal1_2						; Copy a page
 LoadPal1_3 lda (Y_Register),y
-	vbsta	VBXE_CR						; Set the red component
+	vbsta VBXE_CR						; Set the red component
 	iny
 	lda (Y_Register),y
-	vbsta	VBXE_CG						; Set the green component
+	vbsta VBXE_CG						; Set the green component
 	iny
 LP1_3_B
 	lda (Y_Register),y
-	vbsta	VBXE_CB						; Set the blue component and increment CSEL
+	vbsta VBXE_CB						; Set the blue component and increment CSEL
 	iny
-	bne	LoadPal1_3						; Copy a page
+	bne LoadPal1_3						; Copy a page
 	rts
 
 OverFlow1

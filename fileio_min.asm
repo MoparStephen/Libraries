@@ -39,10 +39,10 @@ Temporary_Handler	.byte ' :',$9B,$00
 ; A - letter identificator of the handler
 ;-----------------------------------------------------------------------------
 Get_HATABS_Entry
-	stx	XR_Temp
+	stx XR_Temp
 	tax
-	lda	HATABS,x
-	ldx	XR_Temp
+	lda HATABS,x
+	ldx XR_Temp
 	rts
 
 ;-----------------------------------------------------------------------------
@@ -54,19 +54,19 @@ Get_HATABS_Entry
 ; Y - error code (126 - nonexistent device) if it fails
 ;-----------------------------------------------------------------------------
 Find_Matching_IOCB
-	sta	AR_Temp
-	ldx	#$00
-	ldy	#$01
+	sta AR_Temp
+	ldx #$00
+	ldy #$01
 Find_Matching_IOCB_l1
-	lda	ICHID,x
-	jsr	Get_HATABS_Entry
-	cmp	AR_Temp							; Compare device ID with the one searched
-	beq	Find_Matching_IOCB_Found
+	lda ICHID,x
+	jsr Get_HATABS_Entry
+	cmp AR_Temp							; Compare device ID with the one searched
+	beq Find_Matching_IOCB_Found
 	txa
-	add	#$10							; Add IOCB structure length to x pointer, and try next channel
+	add #$10							; Add IOCB structure length to x pointer, and try next channel
 	tax
-	bpl	Find_Matching_IOCB_l1
-	ldy	#-126							; If fails, change error code to "NONEXISTENT DEVICE"
+	bpl Find_Matching_IOCB_l1
+	ldy #-126							; If fails, change error code to "NONEXISTENT DEVICE"
 Find_Matching_IOCB_Found
 	rts
 
@@ -79,17 +79,17 @@ Find_Matching_IOCB_Found
 ; there are no references for its orgins
 ;-----------------------------------------------------------------------------
 Find_First_IOCB
-	ldx	#$00							; Start with channel #0
-	ldy	#$01							; Set the error code to #1 - success
+	ldx #$00							; Start with channel #0
+	ldy #$01							; Set the error code to #1 - success
 Find_First_IOCB_l1
-	lda	ICHID,x							; Get the device ID
-	cmp	#$FF							; If equals to $ff - channel is not opened
-	beq	Find_First_IOCB_found
+	lda ICHID,x							; Get the device ID
+	cmp #$FF							; If equals to $ff - channel is not opened
+	beq Find_First_IOCB_found
 	txa
-	add	#$10							; Add IOCB structure length to x pointer, and try next channel
+	add #$10							; Add IOCB structure length to x pointer, and try next channel
 	tax
-	bpl	Find_First_IOCB_l1
-	ldy	#-95							; If fails, change error code to "TOO MANY CHANNELS OPEN"
+	bpl Find_First_IOCB_l1
+	ldy #-95							; If fails, change error code to "TOO MANY CHANNELS OPEN"
 Find_First_IOCB_found
 	rts
 
@@ -97,27 +97,27 @@ Find_First_IOCB_found
 ; PutLine - puts line of text pointed by TextPtr ending with ENTER ($9b)
 ;-----------------------------------------------------------------------------
 PutLine
-	ldx	Console_IOCB
-	cpx	#$FF
-	bne	PutLine_IOCB_Open
-	lda	#'E'
-	jsr	Find_Matching_IOCB
-	cpy	#$01
-	beq	PutLine_IOCB_Found
-	lda	#'E'							; Open through console handler
-	ldy	#$00							; Mode 0 - standard text console
-	jsr	SetGraphicsMode
+	ldx Console_IOCB
+	cpx #$FF
+	bne PutLine_IOCB_Open
+	lda #'E'
+	jsr Find_Matching_IOCB
+	cpy #$01
+	beq PutLine_IOCB_Found
+	lda #'E'							; Open through console handler
+	ldy #$00							; Mode 0 - standard text console
+	jsr SetGraphicsMode
 PutLine_IOCB_Open
 PutLine_IOCB_Found
-	lda	#CIO_puttext
-	sta	ICCMD,x
-	lda	#$FF
-	sta	ICBLL,x
-	lda	TextPtr
-	sta	ICBAL,x
-	lda	TextPtr+1
-	sta	ICBAL+1,x
-	jsr	CIOV
+	lda #CIO_puttext
+	sta ICCMD,x
+	lda #$FF
+	sta ICBLL,x
+	lda TextPtr
+	sta ICBAL,x
+	lda TextPtr+1
+	sta ICBAL+1,x
+	jsr CIOV
 PutLine_Error
 	rts
 
@@ -131,21 +131,21 @@ PutLine_Error
 ; Y - error code (95 - too many channels open) if it fails
 ;-----------------------------------------------------------------------------
 SetGraphicsMode
-	jsr	Find_First_IOCB					; Find first free IOCB
-	cpy	#1
-	bne	SetGraphicsMode_Error			; No more free IOCB
-	sta	Temporary_Handler
-	lda	#<Temporary_Handler
-	sta	ICBAL,x
-	lda	#>Temporary_Handler
-	sta	ICBAL+1,x
+	jsr Find_First_IOCB					; Find first free IOCB
+	cpy #1
+	bne SetGraphicsMode_Error			; No more free IOCB
+	sta Temporary_Handler
+	lda #<Temporary_Handler
+	sta ICBAL,x
+	lda #>Temporary_Handler
+	sta ICBAL+1,x
 SetGraphicsMode_Common
 	tya
-	sta	ICAX2,x							; Mode to obtain
-	lda	#CIO_open
-	sta	ICCMD,x
-	lda	#CIO_read | CIO_write			; READ and WRITE
-	sta	ICAX1,x
-	jsr	CIOV
+	sta ICAX2,x							; Mode to obtain
+	lda #CIO_open
+	sta ICCMD,x
+	lda #CIO_read | CIO_write			; READ and WRITE
+	sta ICAX1,x
+	jsr CIOV
 SetGraphicsMode_Error
 	rts
