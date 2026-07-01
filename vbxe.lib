@@ -137,9 +137,9 @@ VBXE_Detected:
 ; NOTE: This code cannot run from ROM
 ;       The palette is stored as 256R, 256G, 256B bytes for easy loading
 VBXE_SetPalette
-	vbsta VBXE_CSEL					; Start from color index A
+	vbsta VBXE_CSEL						; Start from color index A
 	txa
-	vbsta VBXE_PSEL					; Select the palette to alter
+	vbsta VBXE_PSEL						; Select the palette to alter
 	lda Pal_ptr
 	sta VBXE_SetPalette_pal1			; Setup self-modyfying code
 	sta VBXE_SetPalette_pal2
